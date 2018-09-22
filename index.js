@@ -12,16 +12,31 @@ connect.then((db) => {
 
     //  *** Method-2 Using .Create() Method of Dishes
     Dishes.create({
-        name: "Uthapizza",
+        name: "Uthapizza4",
         description: "text"
     })
     .then((dish) => {
         console.log(dish);
 
-        return Dishes.find({}).exec();
+        return Dishes.findByIdAndUpdate(dish._id , {
+            $set: {description: 'Updated test'}
+        },{
+            new: true        // for exec to take updated document and niot non-updated one
+        }).exec();
     })
-    .then((dishes) => {
-        console.log(dishes);
+    .then((dish) => {
+        console.log(dish);
+
+        dish.comments = dish.comments.concat({                             // Support for usePushEach is removed
+                            rating: 5,                                     // from mongodb 5.0 and above hence puch is
+                            comment: 'I\'m getting a Sinking feeling',     // not supported and hence concat method is used
+                            author: 'Leonardo di Carpaccio'
+                        });
+
+        return dish.save();
+    })
+    .then((dish)=>{
+        console.log(dish);    
 
         return db.collection("dishes").drop();
     })
